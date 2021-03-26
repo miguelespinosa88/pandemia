@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=F1:47:43:CD:B3:76:F9:68:FE:1A:EA:89:49:46:B9:8D:44:0D:9A:F0%3Bedu.itesm.pandemia
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    edu.itesm.pandemia
+
+    SHA-1 certificate fingerprint:
+    F1:47:43:CD:B3:76:F9:68:FE:1A:EA:89:49:46:B9:8D:44:0D:9A:F0
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBLLru0bJRAsevH8iHYqlccMHEEYv1sydM</string>
+</resources>
