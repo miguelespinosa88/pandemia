@@ -1,5 +1,6 @@
 package edu.itesm.pandemia
 
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -12,14 +13,19 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.Collections.addAll
 
 data class Pais(var nombre: String,
                 var latitude: Double,
                 var longitude: Double,
                 var casos: Double,
-                var recuperados: Double)
+                var recuperados: Double,
+                var defunciones: Double,
+                var tests: Double)
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -79,6 +85,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun viewData(view: View){
+        mMap.clear()
         for (pais in data){
             mMap.addMarker(MarkerOptions().position(
                     LatLng(pais.latitude, pais.longitude)).title( pais.nombre))
@@ -99,9 +106,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val latitude = countryInfoData.getDouble("lat")
                 val longitude = countryInfoData.getDouble("long")
                 val casos = pais.getDouble("cases")
-                val recuperdos = pais.getDouble("recovered")
+                val recuperados = pais.getDouble("recovered")
+                val defunciones = pais.getDouble("deaths")
+                val tests = pais.getDouble("tests")
 
-                val paisObject = Pais(nombre,latitude, longitude, casos, recuperdos)
+                val paisObject = Pais(nombre,latitude, longitude, casos, recuperados,defunciones, tests)
 
                 data.add(paisObject)
 
@@ -113,4 +122,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         requestQueue.add(peticion)
     }
+
+    private var muerte = mutableListOf<Pais>()
+    fun viewMuertes(view: View){
+        data.sortByDescending { it.defunciones }
+        muerte=data.subList(0,10)
+        mMap.clear()
+         for (pais in muerte){
+             mMap.addMarker(MarkerOptions().position(
+                     LatLng(pais.latitude, pais.longitude)).title( pais.nombre).icon(BitmapDescriptorFactory.fromResource(R.drawable.calavera)))
+         }
+    }
+
+    private var caso = mutableListOf<Pais>()
+    fun viewCasos(view: View){
+        data.sortBy { it.casos }
+        caso=data.subList(0,10)
+        mMap.clear()
+        for (pais in caso){
+            mMap.addMarker(MarkerOptions().position(
+                    LatLng(pais.latitude, pais.longitude)).title( pais.nombre).icon(BitmapDescriptorFactory.fromResource(R.drawable.cubrebocas)))
+        }
+    }
+
+    private var test = mutableListOf<Pais>()
+    fun viewTests(view: View){
+        data.sortByDescending { it.tests }
+        test=data.subList(0,10)
+        mMap.clear()
+        for (pais in test){
+            mMap.addMarker(MarkerOptions().position(
+                    LatLng(pais.latitude, pais.longitude)).title( pais.nombre).icon(BitmapDescriptorFactory.fromResource(R.drawable.prueba)))
+        }
+    }
+
 }
