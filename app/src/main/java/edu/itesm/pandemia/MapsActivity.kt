@@ -17,6 +17,11 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Collections.addAll
 
 data class Pais(var nombre: String,
@@ -43,6 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         cargaDatos()
+        getCountries()
     }
 
     /**
@@ -85,13 +91,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun viewData(view: View){
+
         mMap.clear()
+        //Volley
         for (pais in data){
             mMap.addMarker(MarkerOptions().position(
                     LatLng(pais.latitude, pais.longitude)).title( pais.nombre))
         }
     }
 
+    fun verData(view: View){
+
+        mMap.clear()
+        //Retrofit
+        for (pais in paisesGson){
+            mMap.addMarker(MarkerOptions().position(
+                    LatLng(pais?.countryInfo.lat?:0.0, pais?.countryInfo.long?:0.0)).title( pais.nombre).icon(BitmapDescriptorFactory.fromResource(R.drawable.simbolomapa)))
+        }
+
+    }
 
     private val data = mutableListOf<Pais>()
     fun cargaDatos(){
@@ -156,4 +174,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun getRetrofit():Retrofit{
+        return Retrofit.Builder().baseUrl("https://disease.sh/v3/covid-19/").addConverterFactory(GsonConverterFactory.create()).build()
+    }
+
+    private lateinit var paisesGson: ArrayList<PaisGson>
+    private fun getCountries(){
+        val callToService = getRetrofit().create(APIService::class.java)
+
+        CoroutineScope(Dispatchers.IO).launch{
+            val responseFromService = callToService.getCountries()
+            runOnUiThread {
+                paisesGson = responseFromService.body() as ArrayList<PaisGson>
+            }
+        }
+
+    }
 }
